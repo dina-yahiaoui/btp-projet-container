@@ -1,0 +1,71 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "InfraMusicStore API",
+    "description": "API de gestion de disquaire en ligne",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:5000"
+    }
+  ],
+  "paths": {
+    "/api/artists": {
+      "get": {
+        "summary": "Récupérer tous les artistes",
+        "responses": {
+          "200": {
+            "description": "Liste des artistes récupérée avec succès"
+          }
+        }
+      },
+      "post": {
+        "summary": "Créer un nouvel artiste",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "Name": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Artiste créé"
+          }
+        }
+      }
+    },
+    "/api/artists/{id}": {
+      "get": {
+        "summary": "Récupérer un artiste par son ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Artiste trouvé"
+          },
+          "404": {
+            "description": "Artiste non trouvé"
+          }
+        }
+      }
+    }
+  }
+}
