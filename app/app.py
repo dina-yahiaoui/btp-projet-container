@@ -1,4 +1,5 @@
 from flask import Flask, jsonify, request
+from flask_swagger_ui import get_swaggerui_blueprint
 import mysql.connector
 import os
 from dotenv import load_dotenv
@@ -7,6 +8,25 @@ from dotenv import load_dotenv
 load_dotenv()
 
 app = Flask(__name__)
+
+# Configuration Swagger
+SWAGGER_URL = '/docs'  # L'URL pour accéder à la doc
+API_URL = '/static/swagger.json'  # Où se trouve le fichier JSON qu'on a créé
+
+swaggerui_blueprint = get_swaggerui_blueprint(
+    SWAGGER_URL,
+    API_URL,
+    config={
+        'app_name': "InfraMusicStore API"
+    }
+)
+
+app.register_blueprint(swaggerui_blueprint, url_prefix=SWAGGER_URL)
+
+# Route pour servir le fichier swagger.json (nécessaire pour que l'UI le trouve)
+@app.route('/static/swagger.json')
+def swagger_json():
+    return app.send_static_file('swagger.json')
 
 # Configuration de la base de données
 def get_db_connection():
