@@ -1,0 +1,32 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Récupération du code
+      uses: actions/checkout@v3
+
+    - name: Installation de Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+
+    - name: Installation des dépendances
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r app/requirements.txt
+
+    - name: Vérification simple (Lint)
+      # Ceci vérifie juste s'il n'y a pas de grosses erreurs de syntaxe
+      run: |
+        pip install pylint
+        # On note l'app mais on ne bloque pas le build pour l'instant (exit-zero)
+        pylint --errors-only app/app.py || true
