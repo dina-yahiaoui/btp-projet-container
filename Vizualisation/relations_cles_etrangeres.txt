@@ -1,0 +1,75 @@
+=== BASE DE DONNÉES CHINOOK ===
+
+## TABLES ET RELATIONS
+
+### 1. Table Artist
+- Rôle : Stocker les informations des artistes musicaux
+- Clé primaire : ArtistId (INT)
+- Relations sortantes : Aucune
+- Relations entrantes :
+  - Album.ArtistId → Artist.ArtistId (1 artiste a N albums)
+
+### 2. Table Album
+- Rôle : Stocker les albums musicaux
+- Clé primaire : AlbumId (INT)
+- Clé étrangère : ArtistId → Artist.ArtistId
+- Relations sortantes :
+  - ArtistId référence Artist (relation 1-N : chaque album appartient à 1 artiste)
+- Relations entrantes :
+  - Track.AlbumId → Album.AlbumId (1 album a N pistes)
+
+### 3. Table Genre
+- Rôle : Stocker les genres musicaux (dictionnaire)
+- Clé primaire : GenreId (INT)
+- Relations sortantes : Aucune
+- Relations entrantes :
+  - Track.GenreId → Genre.GenreId (1 genre a N pistes)
+
+### 4. Table MediaType
+- Rôle : Stocker les formats/types de média (dictionnaire)
+- Clé primaire : MediaTypeId (INT)
+- Relations sortantes : Aucune
+- Relations entrantes :
+  - Track.MediaTypeId → MediaType.MediaTypeId (1 format a N pistes)
+
+### 5. Table Track
+- Rôle : Stocker les pistes musicales
+- Clé primaire : TrackId (INT)
+- Clés étrangères :
+  - AlbumId → Album.AlbumId (relation 1-N : chaque piste appartient à 1 album)
+  - GenreId → Genre.GenreId (relation 1-N : chaque piste a 1 genre)
+  - MediaTypeId → MediaType.MediaTypeId (relation 1-N : chaque piste a 1 format)
+- Relations entrantes :
+  - PlaylistTrack.TrackId → Track.TrackId (N pistes dans N playlists via table associative)
+
+### 6. Table Playlist
+- Rôle : Stocker les playlists
+- Clé primaire : PlaylistId (INT)
+- Relations sortantes : Aucune
+- Relations entrantes :
+  - PlaylistTrack.PlaylistId → Playlist.PlaylistId (1 playlist a N pistes via table associative)
+
+### 7. Table PlaylistTrack (table associative)
+- Rôle : Liaison N-N entre Playlist et Track
+- Clé primaire composite : (PlaylistId, TrackId)
+- Clés étrangères :
+  - PlaylistId → Playlist.PlaylistId (relation N-N)
+  - TrackId → Track.TrackId (relation N-N)
+
+## RÉSUMÉ DES RELATIONS
+
+Relation 1-N (un-à-plusieurs) :
+- 1 Artist → N Album
+- 1 Album → N Track
+- 1 Genre → N Track
+- 1 MediaType → N Track
+
+Relation N-N (plusieurs-à-plusieurs) :
+- Playlist ↔ Track (via PlaylistTrack)
+
+## NORMALISATION
+
+✓ Toutes les tables respectent la 3ème forme normale (3NF) :
+  - Chaque table a une clé primaire unique
+  - Pas de redondance de données
+  - Pas de dépendance partielle ou transitive
