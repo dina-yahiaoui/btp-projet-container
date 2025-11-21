@@ -5,28 +5,96 @@
     "version": "1.0.0",
     "description": "API REST pour gérer artistes, albums, genres et pistes."
   },
+  "servers": [
+    {
+      "url": "http://localhost:5000",
+      "description": "Serveur local"
+    }
+  ],
+  "components": {
+    "schemas": {
+      "Artist": {
+        "type": "object",
+        "properties": {
+          "ArtistId": { "type": "integer", "example": 1 },
+          "Name": { "type": "string", "example": "AC/DC" }
+        }
+      },
+      "Album": {
+        "type": "object",
+        "properties": {
+          "AlbumId": { "type": "integer", "example": 1 },
+          "Title": { "type": "string", "example": "Back in Black" },
+          "ArtistId": { "type": "integer", "example": 1 }
+        }
+      },
+      "Genre": {
+        "type": "object",
+        "properties": {
+          "GenreId": { "type": "integer", "example": 1 },
+          "Name": { "type": "string", "example": "Rock" }
+        }
+      },
+      "Track": {
+        "type": "object",
+        "properties": {
+          "TrackId": { "type": "integer", "example": 1 },
+          "Name": { "type": "string", "example": "New Track" },
+          "AlbumId": { "type": "integer", "example": 1 },
+          "MediaTypeId": { "type": "integer", "example": 1 },
+          "GenreId": { "type": "integer", "example": 1 },
+          "Composer": { "type": "string", "example": "Test Composer" },
+          "Milliseconds": { "type": "integer", "example": 210000 },
+          "Bytes": { "type": "integer", "example": 1234567 },
+          "UnitPrice": { "type": "number", "format": "float", "example": 0.99 }
+        }
+      }
+    }
+  },
   "paths": {
     "/api/artists": {
       "get": {
         "summary": "Liste des artistes",
         "responses": {
           "200": {
-            "description": "Liste retournée"
+            "description": "Liste des artistes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/Artist" }
+                }
+              }
+            }
           }
         }
       },
       "post": {
         "summary": "Créer un artiste",
         "requestBody": {
-          "required": true
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "Name": { "type": "string" }
+                },
+                "required": ["Name"]
+              },
+              "example": {
+                "Name": "Artiste Swagger"
+              }
+            }
+          }
         },
         "responses": {
-          "201": {
-            "description": "Artiste créé"
-          }
+          "201": { "description": "Artiste créé" },
+          "400": { "description": "Données invalides" }
         }
       }
     },
+
     "/api/artists/{artistId}": {
       "get": {
         "summary": "Récupérer un artiste",
@@ -39,8 +107,15 @@
           }
         ],
         "responses": {
-          "200": { "description": "Artiste trouvé" },
-          "404": { "description": "Non trouvé" }
+          "200": {
+            "description": "Artiste trouvé",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Artist" }
+              }
+            }
+          },
+          "404": { "description": "Artiste non trouvé" }
         }
       },
       "put": {
@@ -53,8 +128,24 @@
             "schema": { "type": "integer" }
           }
         ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "Name": { "type": "string" }
+                },
+                "required": ["Name"]
+              },
+              "example": { "Name": "Nom mis à jour" }
+            }
+          }
+        },
         "responses": {
-          "200": { "description": "Artiste mis à jour" }
+          "200": { "description": "Artiste mis à jour" },
+          "404": { "description": "Artiste non trouvé" }
         }
       },
       "delete": {
@@ -69,39 +160,378 @@
         ],
         "responses": {
           "200": { "description": "Artiste supprimé" },
-          "404": { "description": "Non trouvé" }
+          "404": { "description": "Artiste non trouvé" }
         }
       }
     },
 
     "/api/albums": {
-      "get": { "summary": "Liste des albums", "responses": { "200": { "description": "OK" } } },
-      "post": { "summary": "Créer un album", "responses": { "201": { "description": "Créé" } } }
+      "get": {
+        "summary": "Liste des albums",
+        "responses": {
+          "200": {
+            "description": "Liste des albums",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/Album" }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Créer un album",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "Title": { "type": "string" },
+                  "ArtistId": { "type": "integer" }
+                },
+                "required": ["Title", "ArtistId"]
+              },
+              "example": {
+                "Title": "Nouvel Album",
+                "ArtistId": 1
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Album créé" },
+          "400": { "description": "Données invalides" }
+        }
+      }
     },
+
     "/api/albums/{albumId}": {
-      "get": { "summary": "Récupérer un album", "responses": { "200": { "description": "OK" }, "404": { "description": "Non trouvé" } } },
-      "put": { "summary": "Mettre à jour un album", "responses": { "200": { "description": "OK" } } },
-      "delete": { "summary": "Supprimer un album", "responses": { "200": { "description": "OK" }, "404": { "description": "Non trouvé" } } }
+      "get": {
+        "summary": "Récupérer un album",
+        "parameters": [
+          {
+            "name": "albumId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Album trouvé",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Album" }
+              }
+            }
+          },
+          "404": { "description": "Album non trouvé" }
+        }
+      },
+      "put": {
+        "summary": "Mettre à jour un album",
+        "parameters": [
+          {
+            "name": "albumId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "Title": { "type": "string" },
+                  "ArtistId": { "type": "integer" }
+                },
+                "required": ["Title", "ArtistId"]
+              },
+              "example": {
+                "Title": "Album mis à jour",
+                "ArtistId": 1
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Album mis à jour" },
+          "404": { "description": "Album non trouvé" }
+        }
+      },
+      "delete": {
+        "summary": "Supprimer un album",
+        "parameters": [
+          {
+            "name": "albumId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Album supprimé" },
+          "404": { "description": "Album non trouvé" }
+        }
+      }
     },
 
     "/api/genres": {
-      "get": { "summary": "Liste des genres", "responses": { "200": { "description": "OK" } } },
-      "post": { "summary": "Créer un genre", "responses": { "201": { "description": "Créé" } } }
+      "get": {
+        "summary": "Liste des genres",
+        "responses": {
+          "200": {
+            "description": "Liste des genres",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/Genre" }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Créer un genre",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "Name": { "type": "string" }
+                },
+                "required": ["Name"]
+              },
+              "example": {
+                "Name": "New Genre"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Genre créé" },
+          "400": { "description": "Données invalides" }
+        }
+      }
     },
+
     "/api/genres/{genreId}": {
-      "get": { "summary": "Récupérer un genre", "responses": { "200": { "description": "OK" }, "404": { "description": "Non trouvé" } } },
-      "put": { "summary": "Mettre à jour un genre", "responses": { "200": { "description": "OK" } } },
-      "delete": { "summary": "Supprimer un genre", "responses": { "200": { "description": "OK" }, "404": { "description": "Non trouvé" } } }
+      "get": {
+        "summary": "Récupérer un genre",
+        "parameters": [
+          {
+            "name": "genreId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Genre trouvé",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Genre" }
+              }
+            }
+          },
+          "404": { "description": "Genre non trouvé" }
+        }
+      },
+      "put": {
+        "summary": "Mettre à jour un genre",
+        "parameters": [
+          {
+            "name": "genreId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "Name": { "type": "string" }
+                },
+                "required": ["Name"]
+              },
+              "example": { "Name": "Genre mis à jour" }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Genre mis à jour" },
+          "404": { "description": "Genre non trouvé" }
+        }
+      },
+      "delete": {
+        "summary": "Supprimer un genre",
+        "parameters": [
+          {
+            "name": "genreId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Genre supprimé" },
+          "404": { "description": "Genre non trouvé" }
+        }
+      }
     },
 
     "/api/tracks": {
-      "get": { "summary": "Liste des pistes", "responses": { "200": { "description": "OK" } } },
-      "post": { "summary": "Créer une piste", "responses": { "201": { "description": "Créé" } } }
+      "get": {
+        "summary": "Liste des pistes",
+        "responses": {
+          "200": {
+            "description": "Liste des pistes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/Track" }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Créer une piste",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "Name": { "type": "string" },
+                  "AlbumId": { "type": "integer" },
+                  "MediaTypeId": { "type": "integer" },
+                  "GenreId": { "type": "integer" },
+                  "Composer": { "type": "string" },
+                  "Milliseconds": { "type": "integer" },
+                  "Bytes": { "type": "integer" },
+                  "UnitPrice": { "type": "number", "format": "float" }
+                },
+                "required": ["Name", "AlbumId", "MediaTypeId", "GenreId", "Milliseconds", "UnitPrice"]
+              },
+              "example": {
+                "Name": "New Track From Swagger",
+                "AlbumId": 1,
+                "MediaTypeId": 1,
+                "GenreId": 1,
+                "Composer": "Test Composer",
+                "Milliseconds": 210000,
+                "Bytes": 1234567,
+                "UnitPrice": 0.99
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Piste créée" },
+          "400": { "description": "Données invalides" }
+        }
+      }
     },
+
     "/api/tracks/{trackId}": {
-      "get": { "summary": "Récupérer une piste", "responses": { "200": { "description": "OK" }, "404": { "description": "Non trouvé" } } },
-      "put": { "summary": "Mettre à jour une piste", "responses": { "200": { "description": "OK" } } },
-      "delete": { "summary": "Supprimer une piste", "responses": { "200": { "description": "OK" }, "404": { "description": "Non trouvé" } } }
+      "get": {
+        "summary": "Récupérer une piste",
+        "parameters": [
+          {
+            "name": "trackId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Piste trouvée",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Track" }
+              }
+            }
+          },
+          "404": { "description": "Piste non trouvée" }
+        }
+      },
+      "put": {
+        "summary": "Mettre à jour une piste",
+        "parameters": [
+          {
+            "name": "trackId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "description": "Mise à jour partielle possible",
+                "properties": {
+                  "Name": { "type": "string" },
+                  "AlbumId": { "type": "integer" },
+                  "MediaTypeId": { "type": "integer" },
+                  "GenreId": { "type": "integer" },
+                  "Composer": { "type": "string" },
+                  "Milliseconds": { "type": "integer" },
+                  "Bytes": { "type": "integer" },
+                  "UnitPrice": { "type": "number", "format": "float" }
+                }
+              },
+              "example": {
+                "Name": "Track modifiée",
+                "UnitPrice": 1.29
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Piste mise à jour" },
+          "404": { "description": "Piste non trouvée" }
+        }
+      },
+      "delete": {
+        "summary": "Supprimer une piste",
+        "parameters": [
+          {
+            "name": "trackId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Piste supprimée" },
+          "404": { "description": "Piste non trouvée" }
+        }
+      }
     }
   }
 }

@@ -44,7 +44,7 @@ CREATE TABLE IF NOT EXISTS Track (
 );
 
 -- ========= DONNÉES DE TEST =========
--- On a largement plus de 20 inserts répartis sur 4 tables
+
 
 -- 8 artistes
 INSERT INTO Artist (Name) VALUES

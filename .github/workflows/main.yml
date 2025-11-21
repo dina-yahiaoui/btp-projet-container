@@ -25,7 +25,7 @@ jobs:
         pip install -r app/requirements.txt
 
     - name: Vérification simple (Lint)
-      # Ceci vérifie juste s'il n'y a pas de grosses erreurs de syntaxe
+      
       run: |
         pip install pylint
         # On note l'app mais on ne bloque pas le build pour l'instant (exit-zero)
