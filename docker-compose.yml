@@ -1,41 +1,52 @@
+version: "3.9"
+
 services:
-  # Service 1 : Ton API Flask
+  # ───────── API Flask ─────────
   api:
-    build: ./app             # Construit l'image à partir du dossier app
+    build: ./app
     container_name: music_store_api
     restart: always
     ports:
-      - "5000:5000"          # Ouvre le port 5000
+      - "5000:5000"
     depends_on:
-      - db                   # Attend que la DB soit prête
+      - db
     environment:
-      DB_HOST: db            # L'adresse de la DB dans le réseau Docker
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_NAME: ${MYSQL_DATABASE:-chinook}
+      DB_USER: ${MYSQL_USER:-user}
+      DB_PASSWORD: ${MYSQL_PASSWORD:-password}
     networks:
       - backend-network
 
-  # Service 2 : La Base de données (MariaDB)
+  # ───────── Base de données MariaDB ─────────
   db:
     image: mariadb:latest
     container_name: music_store_db
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_DATABASE: chinook
-      MYSQL_USER: user
-      MYSQL_PASSWORD: password
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-rootpassword}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-chinook}
+      MYSQL_USER: ${MYSQL_USER:-user}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-password}
     volumes:
       - ./db_scripts:/docker-entrypoint-initdb.d
+    ports:
+      - "3308:3306"    # ⭐ Permet au notebook de se connecter
     networks:
       - backend-network
 
-  # Service 3 : L'interface Adminer
+  # ───────── Adminer (interface DB) ─────────
   adminer:
     image: adminer
+    container_name: music_store_adminer
     restart: always
     ports:
       - "8080:8080"
     networks:
       - backend-network
 
+# ───────── Réseau Docker ─────────
 networks:
   backend-network:
+    driver: bridge
